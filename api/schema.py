@@ -1,11 +1,20 @@
 import graphene
 from django.shortcuts import get_object_or_404
+from django_celery_results.models import TaskResult
 from graphene_django import DjangoObjectType
 
 from .models import *
+from .tasks import extract_links
 
 
 class LinkType(DjangoObjectType):
+    status = graphene.String()
+
+    def resolve_status(self, info, **kwargs):
+        if not self.celery_task_id:
+            return "NOT_EXISTED"
+        return TaskResult.objects.get(task_id=self.celery_task_id).status
+
     class Meta:
         model = Link
 
@@ -18,6 +27,8 @@ class CreateLinkMutation(graphene.Mutation):
 
     def mutate(self, info, url):
         link = Link.objects.create(url=url)
+        link.celery_task_id = extract_links.delay(link.id)
+        link.save()
         return CreateLinkMutation(id=link.id)
 
 
