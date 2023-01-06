@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'graphene_django',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +131,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# GraphQL settings
+# https://docs.graphene-python.org/projects/django/en/latest/installation/
+
+GRAPHENE = {
+    "SCHEMA": "api.schema.schema"
+}
