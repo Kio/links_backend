@@ -14,4 +14,9 @@ celery -A api multi start worker
 
 # Start server
 echo "Starting server"
-python3 manage.py runserver 0.0.0.0:8000
+nginx
+gunicorn backend.wsgi -w 3 -b 127.0.0.1:8080
+#uwsgi --ini /app/uwsgi.ini
+
+sleep infinity
+
