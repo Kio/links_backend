@@ -1,0 +1,19 @@
+FROM python:3.10.8-alpine
+EXPOSE 8000
+WORKDIR /app
+RUN apk update && apk add git autoconf automake \
+    pkgconfig libtool python3-dev build-base \
+    linux-headers pcre-dev gcc nspr nss libx11 \
+    libxcb libxcomposite libxcursor libxdamage \
+    libxext libxfixes libxi libxrender libxtst \
+    icu-libs cups-libs dbus-libs libxscrnsaver \
+    libxrandr glib alsa-lib pango cairo libatk-1.0 \
+    libatk-bridge-2.0 gtk+3.0 gdk-pixbuf libgcc \
+    gcompat chromium nginx
+COPY requirements.txt /app
+RUN pip3 install -r requirements.txt --no-cache-dir
+RUN pip3 install gunicorn
+COPY . /app
+COPY ./nginx.conf /etc/nginx/http.d/default.conf
+RUN chmod 777 "/app/docker-entrypoint-prod.sh"
+CMD ["/app/docker-entrypoint-prod.sh"]

@@ -6,7 +6,7 @@ from api.models import Link
 
 
 @shared_task
-def extract_links(link_id):
+def extract_links(link_id: int) -> None:
     link = Link.objects.get(id=link_id)
     links = set()
     async_to_sync(extract_links_to_set)(link.url, links)

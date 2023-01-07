@@ -9,4 +9,4 @@ RUN pip3 install -r requirements.txt --no-cache-dir
 RUN apk update && apk add nspr nss libx11 libxcb libxcomposite libxcursor libxdamage libxext libxfixes libxi libxrender libxtst icu-libs cups-libs dbus-libs libxscrnsaver libxrandr glib alsa-lib pango cairo libatk-1.0 libatk-bridge-2.0 gtk+3.0 gdk-pixbuf libgcc gcompat chromium
 COPY . /app
 RUN chmod 777 "/app/docker-entrypoint.sh"
-CMD ["/app/docker-entrypoint.sh"]
+CMD ["/bin/sh", "/app/docker-entrypoint.sh"]

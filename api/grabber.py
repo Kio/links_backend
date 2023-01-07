@@ -2,6 +2,8 @@ import aiohttp as aiohttp
 import requests
 from aiohttp import ClientTimeout
 from pyppeteer import launch
+from pyppeteer.browser import Browser
+from pyppeteer.page import Page
 
 
 class GrabberMixin:
@@ -34,11 +36,11 @@ class AiohttpGrabber(GrabberMixin):
 
 
 class PyppeteerGrabber(GrabberMixin):
-    def __init__(self, timeout: int = 300*1000):
+    def __init__(self, timeout: int = 300*1000) -> None:
         super().__init__(timeout)
-        self._browser = None
+        self._browser: Browser = None
 
-    async def init_browser(self):
+    async def init_browser(self) -> None:
         self._browser = await launch(
             headless=True,
             executablePath="/usr/bin/chromium-browser",
@@ -55,7 +57,7 @@ class PyppeteerGrabber(GrabberMixin):
         )
 
     async def grab(self, url: str) -> str:
-        page = await self._browser.newPage()
+        page: Page = await self._browser.newPage()
         await page.goto(url, timeout=self.timeout)
         content = await page.content()
         await page.close()
