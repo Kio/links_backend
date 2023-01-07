@@ -88,6 +88,7 @@ async def extract_links_to_set(
     url: str,
     links: Set[str]
 ) -> None:
+    """Create a Pyppeteer grabber and add all links including nested into given set."""
     pg = PyppeteerGrabber()
     await pg.init_browser()
     await __extract_links_to_set_with_grabbers(
