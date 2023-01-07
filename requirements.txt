@@ -9,3 +9,4 @@ beautifulsoup4~=4.11.1
 asgiref==3.5.2
 pyppeteer==1.0.2
 lxml==4.8.0
+django-cors-headers==3.13.0

@@ -1,13 +1,11 @@
 import asyncio
 import urllib.parse
 from typing import Set, List
-
 from bs4 import BeautifulSoup
 
-from api.grabber import GrabberMixin
+from api.grabber import GrabberMixin, PyppeteerGrabber, AiohttpGrabber
 
-
-MAX_DEPTH = 3
+MAX_DEPTH = 2
 
 
 def __absolute_href(base_url: str, url: str) -> str:
@@ -62,7 +60,7 @@ async def __links_list_from_url(url: str, grabbers: List[GrabberMixin]) -> List[
     return other_pages_links
 
 
-async def extract_links_to_set(
+async def __extract_links_to_set_with_grabbers(
     url: str,
     links: Set[str],
     grabbers: List[GrabberMixin],
@@ -76,7 +74,7 @@ async def extract_links_to_set(
         if depth + 1 < MAX_DEPTH:
             tasks.append(
                 asyncio.ensure_future(
-                    extract_links_to_set(link, links, grabbers, depth + 1)
+                    __extract_links_to_set_with_grabbers(link, links, grabbers, depth + 1)
                 )
             )
     try:
@@ -84,3 +82,17 @@ async def extract_links_to_set(
     except Exception as error:
         # Log error for future analyse
         pass
+
+
+async def extract_links_to_set(
+    url: str,
+    links: Set[str]
+) -> None:
+    pg = PyppeteerGrabber()
+    await pg.init_browser()
+    await __extract_links_to_set_with_grabbers(
+        url,
+        links,
+        [AiohttpGrabber(), pg]
+    )
+    await pg.close_browser()

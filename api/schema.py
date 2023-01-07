@@ -29,9 +29,10 @@ class CreateLinkMutation(graphene.Mutation):
     class Arguments:
         url = graphene.String(required=True)
 
-    id = graphene.Int()
+    id = graphene.Int(required=True)
 
     def mutate(self, info, url: str):
+        url = url.strip()
         try:
             URLValidator()(url)
         except ValidationError:

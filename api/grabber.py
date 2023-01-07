@@ -1,6 +1,5 @@
-import requests
-import asyncio
 import aiohttp as aiohttp
+import requests
 from aiohttp import ClientTimeout
 from pyppeteer import launch
 
@@ -22,19 +21,46 @@ class RequestsGrabber(GrabberMixin):
 
 class AiohttpGrabber(GrabberMixin):
     async def grab(self, url: str) -> str:
-        async with aiohttp.ClientSession(
-                timeout=ClientTimeout(total=self.timeout),
-                headers={"Accept": "text/html"}
-        ) as session:
-            async with session.get(url) as resp:
-                return await resp.text()
+        try:
+            async with aiohttp.ClientSession(
+                    timeout=ClientTimeout(total=self.timeout),
+                    headers={"Accept": "text/html"}
+            ) as session:
+                async with session.get(url) as resp:
+                    return await resp.text()
+        except:
+            # log error
+            return ""
 
 
 class PyppeteerGrabber(GrabberMixin):
+    def __init__(self, timeout: int = 300*1000):
+        super().__init__(timeout)
+        self._browser = None
+
+    async def init_browser(self):
+        self._browser = await launch(
+            headless=True,
+            executablePath="/usr/bin/chromium-browser",
+            handleSIGINT=False,
+            handleSIGTERM=False,
+            handleSIGHUP=False,
+            args=[
+                '--no-sandbox',
+                '--single-process',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--no-zygote'
+            ]
+        )
+
     async def grab(self, url: str) -> str:
-        browser = await launch()
-        page = await browser.newPage()
+        page = await self._browser.newPage()
         await page.goto(url, timeout=self.timeout)
         content = await page.content()
-        await browser.close()
+        await page.close()
         return content
+
+    async def close_browser(self) -> None:
+        await self._browser.close()
+
